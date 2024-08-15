@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import './register.css'
 import { toast } from 'react-toastify';
 import useAuth from '../../Hooks/useAuth';
@@ -13,22 +13,22 @@ const Register = () => {
         GoogleLogin
     } = useAuth();
     const axiosCommon = useAxiosCommon();
+    const navigate = useNavigate();
     const handleSubmit = async e => {
         e.preventDefault();
         const form = e.target;
         const username = form.userName.value;
         const email = form.email.value;
         const password = form.password.value;
-        console.log(username, email, password);
 
-        const newUser = { email, password, displayName: username };
-        console.log(newUser);
+        const newUser = { email, displayName: username };
         try {
             createUser(email, password);
             const { data } = await axiosCommon.post('/users', newUser);
-            console.log(data);
             if (data.insertedId) {
                 toast.success('user created');
+                form.reset();
+                navigate('/login')
             }
         } catch (error) {
             toast.error(error.message);
@@ -37,8 +37,16 @@ const Register = () => {
 
     const handleGoogleLogin = async () => {
         try {
-            GoogleLogin();
-
+            const result = await GoogleLogin();
+            console.log(result);
+            const displayName = result?.user?.displayName;
+            const email = result?.user?.email;
+            const newUser = { email, displayName };
+            const { data } = await axiosCommon.post('/users', newUser);
+            if (data.insertedId) {
+                toast.success('user created');
+                navigate('/login')
+            }
         }
         catch (err) {
             toast.error(err.message);
