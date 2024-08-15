@@ -8,8 +8,8 @@ import useAxiosCommon from '../../Hooks/useAxiosCommon';
 const Register = () => {
     const {
         createUser,
-        // loading,
-        // setLoading,
+        loading,
+        setLoading,
         GoogleLogin
     } = useAuth();
     const axiosCommon = useAxiosCommon();
@@ -28,6 +28,7 @@ const Register = () => {
                 toast.error('user already exits');
                 form.reset();
                 navigate('/login');
+                setLoading(false)
                 return;
             }
             createUser(email, password);
@@ -36,9 +37,11 @@ const Register = () => {
                 toast.success('user created');
                 form.reset();
                 navigate('/login')
+                setLoading(false)
             }
         } catch (error) {
             toast.error(error.message);
+            setLoading(false)
         }
     }
 
@@ -49,6 +52,7 @@ const Register = () => {
             const isThere = await axiosCommon.get(`/user/${result?.user?.email}`)
             if (isThere) {
                 navigate('/login');
+                setLoading(false)
                 return;
             }
             const displayName = result?.user?.displayName;
@@ -58,11 +62,12 @@ const Register = () => {
             if (data.insertedId) {
                 toast.success('user created');
                 navigate('/login')
+                setLoading(false)
             }
         }
         catch (err) {
             toast.error(err.message);
-            console.log(err.message);
+            setLoading(false)
         }
     }
 
@@ -77,11 +82,11 @@ const Register = () => {
                 <input name='userName' type="text" className="border-0 outline-none shadow-xl px-4 py-2 w-full focus:border-2 focus:border-solid focus:shadow-xl focus:rounded-2xl" placeholder="username" />
                 <input name='email' type="email" className="border-0 outline-none shadow-xl px-4 py-2 w-full focus:border-2 focus:border-solid focus:shadow-xl focus:rounded-2xl" placeholder="email" />
                 <input name='password' type="password" className="border-0 outline-none shadow-xl px-4 py-2 w-full focus:border-2 focus:border-solid focus:shadow-xl focus:rounded-2xl" placeholder="password" />
-                <span className="">Already have an account ? <Link className='btn btn-link'>Sign in</Link>
+                <span className="">Already have an account ? <Link to={'/login'} className='btn btn-link'>Sign in</Link>
                 </span>
-                <input className='btn btn-outline btn-info' type='submit' value='Register' />
+                <input className='btn btn-outline btn-info' disabled={loading} type='submit' value='Register' />
             </form>
-            <button onClick={handleGoogleLogin} className="btn btn-outline btn-success"><FcGoogle className='text-3xl' /> Join with Google</button>
+            <button onClick={handleGoogleLogin} className="btn btn-outline btn-success" disabled={loading}><FcGoogle className='text-3xl' /> Join with Google</button>
         </div>
     );
 };
