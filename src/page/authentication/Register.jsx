@@ -23,6 +23,13 @@ const Register = () => {
 
         const newUser = { email, displayName: username };
         try {
+            const isThere = await axiosCommon.get(`/user/${email}`)
+            if (isThere) {
+                toast.error('user already exits');
+                form.reset();
+                navigate('/login');
+                return;
+            }
             createUser(email, password);
             const { data } = await axiosCommon.post('/users', newUser);
             if (data.insertedId) {
@@ -39,6 +46,11 @@ const Register = () => {
         try {
             const result = await GoogleLogin();
             console.log(result);
+            const isThere = await axiosCommon.get(`/user/${result?.user?.email}`)
+            if (isThere) {
+                navigate('/login');
+                return;
+            }
             const displayName = result?.user?.displayName;
             const email = result?.user?.email;
             const newUser = { email, displayName };
