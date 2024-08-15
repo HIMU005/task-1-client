@@ -1,9 +1,18 @@
 import { Link } from 'react-router-dom';
 import './register.css'
-import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '../../Firebase/firebase.config';
 import { toast } from 'react-toastify';
+import useAuth from '../../Hooks/useAuth';
+import { FcGoogle } from "react-icons/fc";
+import useAxiosCommon from '../../Hooks/useAxiosCommon';
+
 const Register = () => {
+    const {
+        createUser,
+        // loading,
+        // setLoading,
+        GoogleLogin
+    } = useAuth();
+    const axiosCommon = useAxiosCommon();
     const handleSubmit = async e => {
         e.preventDefault();
         const form = e.target;
@@ -15,12 +24,29 @@ const Register = () => {
         const newUser = { email, password, displayName: username };
         console.log(newUser);
         try {
-            createUserWithEmailAndPassword(auth, email, password);
-            toast.success('user created');
+            createUser(email, password);
+            const { data } = await axiosCommon.post('/users', newUser);
+            console.log(data);
+            if (data.insertedId) {
+                toast.success('user created');
+            }
         } catch (error) {
             toast.error(error.message);
         }
     }
+
+    const handleGoogleLogin = async () => {
+        try {
+            GoogleLogin();
+
+        }
+        catch (err) {
+            toast.error(err.message);
+            console.log(err.message);
+        }
+    }
+
+
     return (
         <div>
             <form onSubmit={handleSubmit} className="flex flex-col gap-3 bg-white rounded-2xl px-7 py-5">
@@ -35,6 +61,7 @@ const Register = () => {
                 </span>
                 <input className='btn btn-outline btn-info' type='submit' value='Register' />
             </form>
+            <button onClick={handleGoogleLogin} className="btn btn-outline btn-success"><FcGoogle className='text-3xl' /> Join with Google</button>
         </div>
     );
 };
