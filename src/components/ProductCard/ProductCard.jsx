@@ -1,5 +1,4 @@
 /* eslint-disable react/prop-types */
-import './ProductCard.css'
 const ProductCard = ({ product }) => {
     const { productName, description, ratings, price, creationDateTime, productImage } = product;
     return (

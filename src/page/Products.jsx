@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import ProductCard from "../components/ProductCard/ProductCard";
 import useAxiosCommon from "../Hooks/useAxiosCommon";
 import { toast } from "react-toastify";
+import ProductCard from '../components/ProductCard/ProductCard'
 
 const Products = () => {
     const [products, setProducts] = useState([]);
@@ -14,17 +14,18 @@ const Products = () => {
     const [min, setMin] = useState(1);
     const [max, setMax] = useState(2000);
     const [sorted, setSorted] = useState('');
+    const [totalPage, setTotalPage] = useState(0);
     const axiosCommon = useAxiosCommon();
     const perPage = 10;     //one page have 10 cards
-    const totalPage = Math.ceil(total.count / perPage);
-    // console.log(totalPage);
 
+    // console.log(totalPage);
     useEffect(() => {
         loadData();
         loadBrands();
         loadCategory();
         check();
         loadProductNumber();
+        setPageNumber();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [min, max, page, singleBrand, singleCategory])
     const check = () => {
@@ -33,21 +34,34 @@ const Products = () => {
         }
     }
 
+    const setPageNumber = () => {
+        const newPage = Math.ceil(total / perPage);
+        console.log(total);
+        // if (totalPage === 0) { setTotalPage(1) };
+        if (totalPage === newPage) return;
+
+        setTotalPage(newPage);
+    };
+
+
     const loadProductNumber = async () => {
-        try {
-            const { data } = await axiosCommon.get('/productCount');
-            setTotal(data);
-        } catch (error) {
-            console.error("Error fetching products:", error);
-        }
+        // try {
+        //     const { data } = await axiosCommon.get('/productCount');
+        //     setTotal(data);
+        // } catch (error) {
+        //     console.error("Error fetching products:", error);
+        // }
+        const length = products.length;
+        setTotal(length);
     };
 
     const loadData = async () => {
+        const search = { max, min, singleBrand, singleCategory, page, perPage, sorted }
         try {
-            const { data } = await axiosCommon.get('/products');
+            const { data } = await axiosCommon.get('/products', { params: search });
             setProducts(data);
         } catch (error) {
-            console.error("Error fetching products:", error);
+            console.error("Error fetching filtered products:", error);
         }
     };
 
@@ -97,13 +111,8 @@ const Products = () => {
 
     // apply all the document 
     const handleClick = async () => {
-        const search = { max, min, singleBrand, singleCategory, page, perPage, sorted }
-        try {
-            const { data } = await axiosCommon.get('/products', { params: search });
-            setProducts(data);
-        } catch (error) {
-            console.error("Error fetching filtered products:", error);
-        }
+        setPage(1);
+
     }
 
     // select sort item menu
@@ -112,12 +121,11 @@ const Products = () => {
         setSorted(sort);
     }
 
-
-
-    console.log(products);
+    // console.log(products);
     // console.log(brands);
     // console.log(categories);
     // console.log(min, max);
+    console.log(page, totalPage);
 
     return (
         <div>
@@ -152,7 +160,10 @@ const Products = () => {
                 <input className="border border-primary px-4 py-2 rounded-xl" onChange={handleMin} type="number" name="min" id="" placeholder="Min price" defaultValue={1} />
                 <input className="border border-primary px-4 py-2 rounded-xl" onChange={handleMax} type="number" name="max" id="" placeholder="Max price" defaultValue={2000} />
 
-                <button onClick={handleClick} className="btn btn-outline btn-primary w-auto">Apply</button>
+                <button onClick={() => {
+                    loadData();
+                    handleClick();
+                }} className="btn btn-outline btn-primary w-auto">Apply</button>
             </div>
 
             <div className="flex justify-normal pb-6">
@@ -160,6 +171,7 @@ const Products = () => {
                 <button className="w-20 btn btn-active">page {page}</button>
                 <button onClick={() => { setPage(page + 1) }} disabled={page === totalPage} className="w-20 btn ">»</button>
             </div>
+            {/* {page || totalPage || page} */}
 
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
