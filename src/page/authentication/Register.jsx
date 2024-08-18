@@ -4,6 +4,7 @@ import { toast } from 'react-toastify';
 import useAuth from '../../Hooks/useAuth';
 import { FcGoogle } from "react-icons/fc";
 import useAxiosCommon from '../../Hooks/useAxiosCommon';
+import { Helmet } from 'react-helmet-async';
 
 const Register = () => {
     const {
@@ -74,6 +75,8 @@ const Register = () => {
 
     return (
         <div>
+            <Helmet>  <title> Searching || Register  </title></Helmet>
+
             <form onSubmit={handleSubmit} className="flex flex-col gap-3 bg-white rounded-2xl px-7 py-5">
                 <span className="shadow-lg">Register to join out family</span>
                 {/* <input name='' id="file" type="file" /> */}

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import useAxiosCommon from "../Hooks/useAxiosCommon";
 import { toast } from "react-toastify";
 import ProductCard from '../components/ProductCard/ProductCard'
+import { Helmet } from "react-helmet-async";
 
 const Products = () => {
     const [products, setProducts] = useState([]);
@@ -15,6 +16,7 @@ const Products = () => {
     const [max, setMax] = useState(2000);
     const [sorted, setSorted] = useState('');
     const [totalPage, setTotalPage] = useState(0);
+    const [letSearch, setLetSearch] = useState('');
     const axiosCommon = useAxiosCommon();
     const perPage = 10;     //one page have 10 cards
 
@@ -36,8 +38,6 @@ const Products = () => {
 
     const setPageNumber = () => {
         const newPage = Math.ceil(total / perPage);
-        console.log(total);
-        // if (totalPage === 0) { setTotalPage(1) };
         if (totalPage === newPage) return;
 
         setTotalPage(newPage);
@@ -121,14 +121,48 @@ const Products = () => {
         setSorted(sort);
     }
 
+    // get the input data 
+    const handleSearch = e => {
+        const searchText = e.target.value;
+        setLetSearch(searchText);
+    }
+
+    // searching functionality 
+    const showSearch = async () => {
+        try {
+            const { data } = await axiosCommon.get('/searched', { params: { search: letSearch } });
+            setProducts(data);
+        } catch (error) {
+            console.error('Error fetching search results:', error);
+        }
+    }
+
     // console.log(products);
     // console.log(brands);
     // console.log(categories);
     // console.log(min, max);
-    console.log(page, totalPage);
+    // console.log(page, totalPage);
 
     return (
         <div>
+            <Helmet>
+                <link rel="stylesheet" href="" />
+                <title> Searching || Products  </title>
+            </Helmet>
+
+            <label className=" input-bordered flex justify-center items-center gap-2">
+                <input onChange={handleSearch} type="text" className="w-[200px] px-4 py-2 border rounded-lg" placeholder="Search" />
+                <button onClick={showSearch} className="btn w-auto my-auto"><svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 16 16"
+                    fill="currentColor"
+                    className="h-4 w-4 opacity-70">
+                    <path
+                        fillRule="evenodd"
+                        d="M9.965 11.026a5 5 0 1 1 1.06-1.06l2.755 2.754a.75.75 0 1 1-1.06 1.06l-2.755-2.754ZM10.5 7a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0Z"
+                        clipRule="evenodd" />
+                </svg></button>
+            </label>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 {/* category input  */}
                 <select className="border border-primary px-4 py-2 rounded-xl" onChange={handleCategory} name="" id="">

@@ -2,6 +2,7 @@ import { Link, useNavigate } from "react-router-dom";
 import useAuth from "../../Hooks/useAuth";
 import { toast } from "react-toastify";
 import { FcGoogle } from "react-icons/fc";
+import { Helmet } from "react-helmet-async";
 
 const Login = () => {
 
@@ -41,6 +42,7 @@ const Login = () => {
     }
     return (
         <div>
+            <Helmet>  <title> Searching || Login  </title></Helmet>
             <form onSubmit={handleSubmit} className="flex flex-col gap-3 bg-white rounded-2xl px-7 py-5">
                 <span className="shadow-lg">Login to see our features</span>
                 {/* <input name='' id="file" type="file" /> */}
